@@ -32,16 +32,27 @@ static inline int hexval(char c) {
     return -1;
 }
 
+// to avoid leading and ending space
+void trim(std::string& s) {
+    // ltrim
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(),
+        [](unsigned char ch) { return !std::isspace(ch); }));
 
+    // rtrim
+    s.erase(std::find_if(s.rbegin(), s.rend(),
+        [](unsigned char ch) { return !std::isspace(ch); }).base(), s.end());
+}
 
 // Check if a string is a valid MD5 hex digest
 bool inline is_valid_md5(const std::string& hex) {
     if (hex.size() != 32) {
+        std::cout<<hex.size();
         return false;
     }
     for (char c : hex) {
         if (!isxdigit(c)) {
             return false;
+            std::cout<<c<<' ';
         }
     }
     return true;
@@ -102,7 +113,6 @@ bool md5_crack_multithreaded(const unsigned char* target_digest, std::string& re
     // set number of threads, default to 4
     unsigned int num_threads = std::thread::hardware_concurrency();
     num_threads = num_threads ? num_threads : 4;
-
     std::atomic<bool> found(false);
     for(size_t word_length = MIN_PASSWORD_LENGTH; word_length <= MAX_PASSWORD_LENGTH; ++word_length) {
         const __uint128_t max_num = pow(word_list.size(), word_length);
@@ -151,6 +161,7 @@ int main(int argc, char* argv[]) {
     std::vector<std::string> hashes;
     std::string line;
     while (std::getline(file, line)) {
+        trim(line);
         if(!is_valid_md5(line)) {
             std::cout << "Invalid hash: " << line << "\n";
             std::cout << "skipping...\n";
@@ -165,6 +176,10 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     std::cout<<std::endl;
+
+    unsigned int num_threads = std::thread::hardware_concurrency();
+    num_threads = num_threads ? num_threads : 4;
+    std::cout << "Start cracking\nUsing all " << num_threads << " cores.\n" << std::endl;
 
     // multi-threaded search
     std::vector<std::string> results;
