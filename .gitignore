@@ -3,3 +3,5 @@
 *.lib
 *.pdb
 *.txt
+/.vscode
+md5_multithread
