@@ -1,9 +1,18 @@
+SHELL      := /bin/bash
+OS         := $(shell uname -s)
+
+ifeq ($(OS),Linux)
+  OPENSSL := -I/usr/include/openssl -L/usr/lib -lssl -lcrypto
+else ifeq ($(OS),Darwin)
+  OPENSSL := -I/opt/homebrew/opt/openssl@3/include -L/opt/homebrew/opt/openssl@3/lib -lssl -lcrypto
+  $(error Unsupported OS: $(OS))
+endif
+
 CXX := g++
 CXXFLAGS := -std=c++23 -O3 -ffast-math -pthread 
-OPENSSL := -I/opt/homebrew/opt/openssl@3/include -L/opt/homebrew/opt/openssl@3/lib -lssl -lcrypto
 
 md5_multithread: md5_multithread.cpp permutation.cpp
-	$(CXX) $(CXXFLAGS) -o md5_multithread $(OPENSSL) md5_multithread.cpp permutation.cpp
+	$(CXX) md5_multithread.cpp permutation.cpp $(CXXFLAGS) -o md5_multithread $(OPENSSL) 
 
 CXX_GPU = nvcc
 CXX_FLAGS_GPU = -O3
@@ -13,6 +22,7 @@ md5-gpu:
 
 all: md5_multithread
 
-clean: rm -f md5_multithread md5_gpu
+clean: 
+	rm -f md5_multithread md5_gpu
 
 phony: all clean
