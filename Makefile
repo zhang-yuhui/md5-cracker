@@ -1,10 +1,11 @@
 SHELL      := /bin/bash
 OS         := $(shell uname -s)
 
-ifeq ($(OS),Linux)
+ifeq ($(OS),Linux) # Linux
   OPENSSL := -I/usr/include/openssl -L/usr/lib -lssl -lcrypto
-else ifeq ($(OS),Darwin)
+else ifeq ($(OS),Darwin) # MacOS
   OPENSSL := -I/opt/homebrew/opt/openssl@3/include -L/opt/homebrew/opt/openssl@3/lib -lssl -lcrypto
+else
   $(error Unsupported OS: $(OS))
 endif
 

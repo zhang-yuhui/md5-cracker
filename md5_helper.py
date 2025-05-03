@@ -23,4 +23,4 @@ if __name__ == '__main__':
                 hash = md5_hash(line)
                 outfile.write(hash + '\n')
 
-    print(f"Total{n} passwords written to '{output_filename}'.")
+    print(f"Encrypted total {n} passwords and saved to '{output_filename}'.")
